@@ -6,6 +6,10 @@ import {EditCourseDialogComponent} from '../edit-course-dialog/edit-course-dialo
 import { MatDialog } from '@angular/material/dialog';
 import {map, shareReplay} from 'rxjs/operators';
 import {CoursesHttpService} from '../services/courses-http.service';
+import { select, Store } from '@ngrx/store';
+import { AuthState } from '../../auth/reducers';
+import { AppState } from '../../reducers';
+import { selectAdvancedCourses, selectBeginnerCourses, selectPromoTotal } from '../courses-selectors';
 
 
 
@@ -19,7 +23,7 @@ export class HomeComponent implements OnInit {
 
     promoTotal$: Observable<number>;
 
-    loading$: Observable<boolean>;
+   // loading$: Observable<boolean>;
 
     beginnerCourses$: Observable<Course[]>;
 
@@ -28,7 +32,9 @@ export class HomeComponent implements OnInit {
 
     constructor(
       private dialog: MatDialog,
-      private coursesHttpService: CoursesHttpService) {
+      private store : Store<AppState>
+      //private coursesHttpService: CoursesHttpService
+      ) {
 
     }
 
@@ -37,7 +43,13 @@ export class HomeComponent implements OnInit {
     }
 
   reload() {
+     this.beginnerCourses$ = this.store.pipe(select(selectBeginnerCourses ));
 
+     this.advancedCourses$ = this.store.pipe(select(selectAdvancedCourses));
+
+     this.promoTotal$ = this.store.pipe(select(selectPromoTotal));
+
+    /*
     const courses$ = this.coursesHttpService.findAllCourses()
       .pipe(
         map(courses => courses.sort(compareCourses)),
@@ -61,6 +73,8 @@ export class HomeComponent implements OnInit {
         .pipe(
             map(courses => courses.filter(course => course.promo).length)
         );
+
+        */
 
   }
 
