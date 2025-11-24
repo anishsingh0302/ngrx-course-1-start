@@ -6,6 +6,7 @@ import {EditCourseDialogComponent} from '../edit-course-dialog/edit-course-dialo
 import { MatDialog } from '@angular/material/dialog';
 import {map, shareReplay} from 'rxjs/operators';
 import {CoursesHttpService} from '../services/courses-http.service';
+import {CourseEntityService} from '../services/course-entity.service';
 
 
 
@@ -28,7 +29,8 @@ export class HomeComponent implements OnInit {
 
     constructor(
       private dialog: MatDialog,
-      private coursesHttpService: CoursesHttpService) {
+      // private coursesHttpService: CoursesHttpService,
+      private CourseEntityService: CourseEntityService) {
 
     }
 
@@ -38,28 +40,28 @@ export class HomeComponent implements OnInit {
 
   reload() {
 
-    const courses$ = this.coursesHttpService.findAllCourses()
+    // const courses$ = this.coursesHttpService.findAllCourses()
+    //   .pipe(
+    //     map(courses => courses.sort(compareCourses)),
+    //     shareReplay()
+    //   );
+
+    // this.loading$ = courses$.pipe(map(courses => !!courses));
+
+    this.beginnerCourses$ = this.CourseEntityService.entities$
       .pipe(
-        map(courses => courses.sort(compareCourses)),
-        shareReplay()
+        map((courses) => courses.filter(course => course.category == 'BEGINNER'))
       );
 
-    this.loading$ = courses$.pipe(map(courses => !!courses));
 
-    this.beginnerCourses$ = courses$
+    this.advancedCourses$ = this.CourseEntityService.entities$
       .pipe(
-        map(courses => courses.filter(course => course.category == 'BEGINNER'))
+        map((courses) => courses.filter(course => course.category == 'ADVANCED'))
       );
 
-
-    this.advancedCourses$ = courses$
-      .pipe(
-        map(courses => courses.filter(course => course.category == 'ADVANCED'))
-      );
-
-    this.promoTotal$ = courses$
+    this.promoTotal$ = this.CourseEntityService.entities$
         .pipe(
-            map(courses => courses.filter(course => course.promo).length)
+            map((courses) => courses.filter(course => course.promo).length)
         );
 
   }
